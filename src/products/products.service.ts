@@ -2,24 +2,20 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  OnModuleInit,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PrismaClient } from '@prisma/client';
 import { PaginationDTO } from 'src/common/dto/pagination.dto';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
-export class ProductsService extends PrismaClient implements OnModuleInit {
+export class ProductsService {
   private readonly logger = new Logger('ProductsService');
 
-  async onModuleInit() {
-    await this.$connect();
-    this.logger.log('Database connected');
-  }
+  constructor(private prisma: PrismaService) {}
 
   create(createProductDto: CreateProductDto) {
-    return this.product.create({
+    return this.prisma.product.create({
       data: createProductDto,
     });
   }
@@ -27,11 +23,11 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
   async findAll(paginationDTO: PaginationDTO) {
     const { page, limit } = paginationDTO;
 
-    const totalPages = await this.product.count();
+    const totalPages = await this.prisma.product.count();
     const lastPage = Math.ceil(totalPages / limit);
 
     return {
-      data: await this.product.findMany({
+      data: await this.prisma.product.findMany({
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -44,7 +40,7 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
   }
 
   async findOne(id: number) {
-    const product = await this.product.findFirst({
+    const product = await this.prisma.product.findFirst({
       where: { id: id, available: true  },
     });
 
@@ -57,7 +53,7 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
   async update(id: number, updateProductDto: UpdateProductDto) {
     await this.findOne(id);
 
-    return this.product.update({
+    return this.prisma.product.update({
       where: { id: id },
       data: updateProductDto,
     });
@@ -66,10 +62,10 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
   async remove(id: number) {
     await this.findOne(id);
 
-    // return this.product.delete({
+    // return this.prisma.product.delete({
     //   where: { id: id },
     // });
-    const product = await this.product.update({
+    const product = await this.prisma.product.update({
       where: { id: id },
       data: {
         available: false,

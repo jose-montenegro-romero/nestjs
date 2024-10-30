@@ -10,7 +10,7 @@ import { ConfigModule } from '@nestjs/config/dist';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    ProductsModule
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
