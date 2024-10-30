@@ -16,10 +16,7 @@ async function bootstrap() {
     origin: process.env.ORIGINS.split(',') || true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-  });
-
-  console.log(app);
-  
+  });  
 
   await app.listen(process.env.PORT ?? 3000);
 }
